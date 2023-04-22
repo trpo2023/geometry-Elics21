@@ -1,20 +1,25 @@
-
+.PHONY: all clean
+# Цель будет выполняться, даже если в корне репозитория создан файл с именем clean или all
 
 
 all : geometry
 
 
 geometry : obj/geometry/geometry.o obj/libgeometry/check.o
-	gcc -Wall -Werror obj/geometry/geometry.o obj/libgeometry/check.o -o geometry
+	gcc -Wall -Werror $^ -o $@
+# $^ (список зависимостей) = obj/geometry/geometry.o obj/libgeometry/check.o ; $@ (имя цели) = geometry
 
 obj/geometry/geometry.o : src/geometry/geometry.c
-	gcc -Wall -Werror -Isrc/ -c src/geometry/geometry.c -o  obj/geometry/geometry.o
+	gcc -Wall -Werror -Isrc/ -c $< -o  $@
+# $< (первая зависимость) = src/geometry/geometry.c obj/libgeometry/check.o ; $@ (имя цели) = obj/geometry/geometry.o
 
 obj/libgeometry/check.o : src/libgeometry/check.c
-	gcc -Wall -Werror -Isrc/ -c src/libgeometry/check.c -o  obj/libgeometry/check.o
+	gcc -Wall -Werror -Isrc/ -c $< -o  $@
 
 clean :
-	rm geometry obj/libgeometry/check.o obj/geometry/geometry.o 
+	rm geometry
+	rm obj/geometry/*.o
+	rm obj/libgeometry/*.o 
 
 run :
 	./geometry
