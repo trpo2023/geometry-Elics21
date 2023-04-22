@@ -1,7 +1,10 @@
 
 
 
-all : obj/geometry/geometry.o obj/libgeometry/check.o
+all : geometry
+
+
+geometry : obj/geometry/geometry.o obj/libgeometry/check.o
 	gcc -Wall -Werror obj/geometry/geometry.o obj/libgeometry/check.o -o geometry
 
 obj/geometry/geometry.o : src/geometry/geometry.c
