@@ -1,3 +1,5 @@
+#pragma once
+
 void check_word(char* a, char* b, int* error, int* ind_open_bracket);
 void find_close_bracket(char* a, int* length, int* ind_close_bracket);
 void check_first_num(
