@@ -2,10 +2,10 @@
 # Цель будет выполняться, даже если в корне репозитория создан файл с именем clean или all или run
 
 
-all : geometry
+all : bin/geometry
 
 
-geometry : obj/geometry/geometry.o obj/libgeometry/check.o
+bin/geometry : obj/geometry/geometry.o obj/libgeometry/check.o
 	gcc -Wall -Werror $^ -o $@
 # $^ (список зависимостей) = obj/geometry/geometry.o obj/libgeometry/check.o ; $@ (имя цели) = geometry
 
@@ -17,9 +17,12 @@ obj/libgeometry/check.o : src/libgeometry/check.c
 	gcc -Wall -Werror -Isrc/ -c $< -o  $@
 
 clean :
-	rm geometry
+	rm bin/geometry
 	rm obj/geometry/*.o
 	rm obj/libgeometry/*.o 
 
 run :
-	./geometry
+	./bin/geometry
+
+
+
