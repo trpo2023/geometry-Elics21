@@ -10,76 +10,76 @@
 
 void token(char* a)
 {
-    float x, y, rad, square, perimetr;
-    char del[] = "circle( ,)";
-    x = atof(strtok(a, del));
-    y = atof(strtok(NULL, del));
-    rad = atof(strtok(NULL, del));
-    square = M_PI * rad * rad;
-    perimetr = 2 * M_PI * rad;
-    printf("x = %.3f\ty = %.3f\trad = %.3f\n", x, y, rad);
-    printf("square = %.3f\tperimetr = %.3f\n", square, perimetr);
+float x, y, rad, square, perimetr;
+char del[] = "circle( ,)";
+x = atof(strtok(a, del));
+y = atof(strtok(NULL, del));
+rad = atof(strtok(NULL, del));
+square = M_PI * rad * rad;
+perimetr = 2 * M_PI * rad;
+printf("x = %.3f\ty = %.3f\trad = %.3f\n", x, y, rad);
+printf("square = %.3f\tperimetr = %.3f\n", square, perimetr);
 }
 
 int main()
 {
-    FILE* file1;
-    FILE* file;
+FILE* file1;
+FILE* file;
 
-    file1 = fopen("geometry.txt", "r");
+file1 = fopen("geometry.txt", "r");
 
-    if (!file1) {
-        printf("Error: cannot open file. Check name of file\n");
-        return 0;
-    }
+if (!file1) {
+printf("Error: cannot open file. Check name of file\n");
+return 0;
+}
 
-    int ind_open_bracket = 0, ind_close_bracket = 0, ind_last_num_elm = 0,
-        ind_first_num_elm = 0, ind_second_num_elm = 0;
-    int length = 0, count = 0, element = 0, error = 0;
+int ind_open_bracket = 0, ind_close_bracket = 0, ind_last_num_elm = 0,
+ind_first_num_elm = 0, ind_second_num_elm = 0;
+int length = 0, count = 0, element = 0, error = 0;
 
-    while (1) {
-        element = fgetc(file1);
-        if (element == EOF) {
-            if (feof(file1) != 0) {
-                break;
-            }
-        }
-        count++;
-    }
-    length = count;
-    fclose(file1);
+while (1) {
+element = fgetc(file1);
+if (element == EOF) {
+if (feof(file1) != 0) {
+break;
+}
+}
+count++;
+}
+length = count;
+fclose(file1);
 
-    char a[length], b[6] = "circle";
-    file = fopen("geometry.txt", "r");
-    while (fgets(a, length + 1, file)) {
-        printf("%s", a);
+char a[length], b[6] = "circle";
+file = fopen("geometry.txt", "r");
+while (fgets(a, length + 1, file)) {
+printf("%s", a);
 
-        check_word(a, b, &error, &ind_open_bracket);
+check_word(a, b, &error, &ind_open_bracket);
 
-        find_close_bracket(a, &length, &ind_close_bracket);
+find_close_bracket(a, &length, &ind_close_bracket);
 
-        check_first_num(a, &ind_open_bracket, &ind_first_num_elm, &error);
+check_first_num(a, &ind_open_bracket, &ind_first_num_elm, &error);
 
-        check_second_num(a, &ind_first_num_elm, &ind_second_num_elm, &error);
+check_second_num(a, &ind_first_num_elm, &ind_second_num_elm, &error);
 
-        check_third_num(
-                a,
-                &ind_second_num_elm,
-                &ind_last_num_elm,
-                &error,
-                &ind_close_bracket);
+check_third_num(
+a,
+&ind_second_num_elm,
+&ind_last_num_elm,
+&error,
+&ind_close_bracket);
 
-        check_close_bracket(
-                a, &ind_last_num_elm, &length, &ind_close_bracket, &error);
-        check_unexpected_token(a, &ind_close_bracket, &length, &error);
+check_close_bracket(
+a, &ind_last_num_elm, &length, &ind_close_bracket, &error);
+check_unexpected_token(a, &ind_close_bracket, &length, &error);
 
-        if (error == 0) {
-            printf("No Errors!\n");
-            token(a);
-        }
+if (error == 0) {
+printf("No Errors!\n");
+token(a);
+}
 
-        error = 0;
-        printf("\n");
-    }
-    return 0;
+error = 0;
+printf("\n");
+}
+return 0;
 }
