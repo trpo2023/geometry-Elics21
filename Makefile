@@ -1,28 +1,66 @@
-.PHONY: all clean run
-# Цель будет выполняться, даже если в корне репозитория создан файл с именем clean или all или run
+APP_NAME = geometry
+TEST_NAME = test
+LIB_NAME = libgeometry
 
+CC = gcc
 
-all : bin/geometry
+CFLAGS = -Wall -Wextra -Werror
+CFLAGS_TEST = -Isrc -MMD -Ithirdparty
+CPPFLAGS = -I src -MP -MMD
 
+BIN_DIR = bin
+OBJ_DIR = obj
+SRC_DIR = src
+TEST_DIR = test
 
-bin/geometry : obj/geometry/geometry.o obj/libgeometry/check.o
-	gcc -Wall -Werror $^ -o $@
-# $^ (список зависимостей) = obj/geometry/geometry.o obj/libgeometry/check.o ; $@ (имя цели) = geometry
+LDLIBS = -lm
 
-obj/geometry/geometry.o : src/geometry/geometry.c
-	gcc -Wall -Werror -Isrc/ -c $< -o  $@
-# $< (первая зависимость) = src/geometry/geometry.c obj/libgeometry/check.o ; $@ (имя цели) = obj/geometry/geometry.o
+APP_PATH = $(BIN_DIR)/$(APP_NAME)
+LIB_PATH = $(OBJ_DIR)/$(SRC_DIR)/$(LIB_NAME)/$(LIB_NAME).a
+TEST_PATH = $(BIN_DIR)/$(TEST_NAME)
+TEST_OBJ_PATH = $(OBJ_DIR)/$(TEST_DIR)
 
-obj/libgeometry/check.o : src/libgeometry/check.c
-	gcc -Wall -Werror -Isrc/ -c $< -o  $@
+SRC_EXT = c
+APP_RUN = $(BIN_DIR)/./$(APP_NAME)
+TEST_CHECK = $(BIN_DIR)/./$(TEST_NAME)
 
-clean :
-	rm bin/geometry
-	rm obj/geometry/*.o
-	rm obj/libgeometry/*.o 
+APP_SOURCES = $(shell find $(SRC_DIR)/$(APP_NAME) -name '*.$(SRC_EXT)')
+APP_OBJECTS = $(APP_SOURCES:$(SRC_DIR)/%.$(SRC_EXT)=$(OBJ_DIR)/$(SRC_DIR)/%.o)
 
-run :
-	./bin/geometry
+LIB_SOURCES = $(shell find $(SRC_DIR)/$(LIB_NAME) -name '*.$(SRC_EXT)')
+LIB_OBJECTS = $(LIB_SOURCES:$(SRC_DIR)/%.$(SRC_EXT)=$(OBJ_DIR)/$(SRC_DIR)/%.o)
 
+DEPS = $(APP_OBJECTS:.o=.d) $(LIB_OBJECTS:.o=.d) 
 
+.PHONY: all
+all: $(APP_PATH)
 
+-include $(DEPS)
+
+$(APP_PATH): $(APP_OBJECTS) $(LIB_PATH)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
+$(LIB_PATH): $(LIB_OBJECTS)
+	ar rcs $@ $^
+
+$(OBJ_DIR)/%.o: %.c
+	$(CC) -c $(CFLAGS) $(CFLAGS_TEST) $< -o $@
+
+.PHONY: test
+test: $(TEST_PATH)
+
+$(TEST_PATH): $(TEST_OBJ_PATH)/main.o $(TEST_OBJ_PATH)/test.o $(LIB_PATH)
+	$(CC) $(CFLAGS) $(CFLAGS_TEST) -o $@ $^ -lm
+	
+$(OBJ)/$(TEST_DIR)/%.o: $(TEST_DIR)/main.c $(TEST_DIR)/test.c $(LIB_OBJECTS)
+	$(CC) $(CFLAGS) $(CFLAGS_TEST) -c -o $@ $< -lm
+
+.PHONY: clean
+clean:
+	rm -f $(APP_PATH) $(TEST_PATH) $(LIB_PATH) 
+	rm -rf $(DEPS) $(APP_OBJECTS) $(LIB_OBJECTS)
+	rm -rf $(TEST_OBJ_PATH)/*.*
+	
+.PHONY: run
+run: $(APP_RUN)
+	$(APP_RUN)
